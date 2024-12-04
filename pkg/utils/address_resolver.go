@@ -20,6 +20,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+const (
+	// NodeFlannelPublicIPAddress identifies the public IP address of the node as seen by Flannel.
+	// This is used by Flannel to communicate with the node.
+	NodeFlannelPublicIPAddress corev1.NodeAddressType = "FlannelPublicIPAddress"
+
+	// FlannelPublicIPAnnotationKey is the key for the annotation that
+	FlannelPublicIPAnnotationKey = "flannel.alpha.coreos.com/public-ip"
+)
+
 var (
 	// DefaultAddressTypePriority is the default node address type
 	// priority list, as taken from the Kubernetes API metrics-server options.
@@ -36,6 +45,9 @@ var (
 		// external, preferring DNS if reported
 		corev1.NodeExternalDNS,
 		corev1.NodeExternalIP,
+
+		// flannel public address
+		NodeFlannelPublicIPAddress,
 	}
 )
 
@@ -56,6 +68,16 @@ type prioNodeAddrResolver struct {
 func (r *prioNodeAddrResolver) NodeAddress(node *corev1.Node) (string, error) {
 	// adapted from k8s.io/kubernetes/pkg/util/node
 	for _, addrType := range r.addrTypePriority {
+		if addrType == NodeFlannelPublicIPAddress {
+			// read flannel annotation
+			flannelAddr, ok := node.Annotations[FlannelPublicIPAnnotationKey]
+			if !ok {
+				continue
+			}
+
+			return flannelAddr, nil
+		}
+
 		for _, addr := range node.Status.Addresses {
 			if addr.Type == addrType {
 				return addr.Address, nil
