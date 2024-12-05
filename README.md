@@ -70,31 +70,33 @@ Installation instructions for previous releases can be found in [Metrics Server 
 
 ### Compatibility Matrix
 
-Metrics Server | Metrics API group/version | Supported Kubernetes version
----------------|---------------------------|-----------------------------
-0.7.x          | `metrics.k8s.io/v1beta1`  | 1.19+
-0.6.x          | `metrics.k8s.io/v1beta1`  | 1.19+
-0.5.x          | `metrics.k8s.io/v1beta1`  | *1.8+
-0.4.x          | `metrics.k8s.io/v1beta1`  | *1.8+
-0.3.x          | `metrics.k8s.io/v1beta1`  | 1.8-1.21
+| Metrics Server | Metrics API group/version | Supported Kubernetes version |
+| -------------- | ------------------------- | ---------------------------- |
+| 0.7.x          | `metrics.k8s.io/v1beta1`  | 1.19+                        |
+| 0.6.x          | `metrics.k8s.io/v1beta1`  | 1.19+                        |
+| 0.5.x          | `metrics.k8s.io/v1beta1`  | \*1.8+                       |
+| 0.4.x          | `metrics.k8s.io/v1beta1`  | \*1.8+                       |
+| 0.3.x          | `metrics.k8s.io/v1beta1`  | 1.8-1.21                     |
 
-*Kubernetes versions lower than v1.16 require passing the `--authorization-always-allow-paths=/livez,/readyz` command line flag
+\*Kubernetes versions lower than v1.16 require passing the `--authorization-always-allow-paths=/livez,/readyz` command line flag
 
 ### High Availability
 
-Metrics Server can be installed in high availability mode directly from a YAML manifest or via the official [Helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server) by setting the `replicas` value greater than `1`. To install the latest Metrics Server release in high availability mode from the  _high-availability.yaml_ manifest, run the following command.
+Metrics Server can be installed in high availability mode directly from a YAML manifest or via the official [Helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server) by setting the `replicas` value greater than `1`. To install the latest Metrics Server release in high availability mode from the _high-availability.yaml_ manifest, run the following command.
 
 On Kubernetes v1.21+:
+
 ```
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
 ```
 
 On Kubernetes v1.19-1.21:
+
 ```shell
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability.yaml
 ```
 
->[!NOTE]
+> [!NOTE]
 > This configuration **requires** having a cluster with at least 2 nodes on which Metrics Server can be scheduled.
 
 Also, to maximize the efficiency of this highly available configuration, it is **recommended** to add the `--enable-aggregator-routing=true` CLI flag to the kube-apiserver so that requests sent to Metrics Server are load balanced between the 2 instances.
@@ -120,11 +122,11 @@ Starting from v0.5.0 Metrics Server comes with default resource requests that sh
 Metrics Server resource usage depends on multiple independent dimensions, creating a [Scalability Envelope].
 Default Metrics Server configuration should work in clusters that don't exceed any of the thresholds listed below:
 
-Quantity               | Namespace threshold | Cluster threshold
------------------------|---------------------|------------------
-#Nodes                 | n/a                 | 100
-#Pods per node         | 70                  | 70
-#Deployments with HPAs | 100                 | 100
+| Quantity               | Namespace threshold | Cluster threshold |
+| ---------------------- | ------------------- | ----------------- |
+| #Nodes                 | n/a                 | 100               |
+| #Pods per node         | 70                  | 70                |
+| #Deployments with HPAs | 100                 | 100               |
 
 Resources can be adjusted proportionally based on number of nodes in the cluster.
 For clusters of more than 100 nodes, allocate additionally:
@@ -142,7 +144,7 @@ where this may impact other scalability dimensions like maximum number of pods p
 Depending on your cluster setup, you may also need to change flags passed to the Metrics Server container.
 Most useful flags:
 
-- `--kubelet-preferred-address-types` - The priority of node address types used when determining an address for connecting to a particular node (default [Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP])
+- `--kubelet-preferred-address-types` - The priority of node address types used when determining an address for connecting to a particular node (default [Hostname,InternalDNS,InternalIP,ExternalDNS,ExternalIP,FlannelPublicIPAddress])
 - `--kubelet-insecure-tls` - Do not verify the CA of serving certificates presented by Kubelets. For testing purposes only.
 - `--requestheader-client-ca-file` - Specify a root certificate bundle for verifying client certificates on incoming requests.
 - `--node-selector` -Can complete to scrape the metrics from the Specified nodes based on labels
