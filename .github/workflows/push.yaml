@@ -3,7 +3,7 @@ name: image-build-push
 on:
   push:
     branches:
-      - main
+      - master
 
 concurrency:
   cancel-in-progress: true
